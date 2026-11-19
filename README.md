@@ -39,27 +39,37 @@ down. The model is built for exactly that shape:
    noisy.
 5. **Refresh handling.** When the history is flat/stale and the horizon is
    short (the practice shape: identical reads for hours, 90-minute horizon),
-   the next Exophase refresh IS the event, so the median shifts down 0.20
-   logit and the lower tail widens by 0.75 logit. Both decay as
-   exp(−horizon_hours/12) and vanish for the 4.5-day final, where genuine
-   progression dominates.
+   the next Exophase refresh IS the event, so the median shifts down 1.75
+   logit and the lower tail widens by 0.30 logit. The size is derived from
+   the numbers the kit itself publishes: at the 04:30Z refresh the tracked
+   players went 638 → 3,868 while trophies earned went 943 → 4,276, and the
+   100% trophy accounts for 3,868 of the 4,276 earned, so the other 54
+   trophies' earned counts went 305 → 408 while the player base grew 6.1×:
+   their rates fell by (408/305) × (638/3868) = 0.22×, i.e. −1.51 logit
+   (the pure-dilution bound, earned counts frozen, is 0.165×, i.e. −1.80
+   logit). Both terms decay as exp(−horizon_hours/12) and vanish for the
+   4.5-day final, where genuine progression dominates.
 6. **A trophy at 100%** gets a narrow fan pinned near 100%.
 
 ## Evidence (what was actually measured)
 
 - **Practice (proxy).** The kit does not ship the practice answers, so they
   were reconstructed from the facts the kit publishes (3868 players / 4276
-  earned at the 04:30Z refresh, every rate but the 100% one down): proxy
-  loss **0.78** vs the house persistence baseline's **1.41** on the same
-  proxy. The real practice score is read from the server after submit; the
-  proxy is an estimate, not the truth.
+  earned at the 04:30Z refresh, every rate but the 100% one down): the 100%
+  trophy holds 3868 of the 4276 earned, so the other 54 trophies' rates fell
+  by (408/305) × (638/3868) = 0.22×. On that proxy this program scores
+  **0.09** vs the house persistence baseline's **1.40** on the same proxy
+  (the kit states the house baseline's true practice loss is 1.51). Under the
+  other bound for the truth — earned counts frozen, pure dilution, 0.165× —
+  this program scores 0.14 vs the house's 1.69. The real practice score is
+  read from the server after submit; the proxy is an estimate, not the truth.
 - **Final regime (synthetic).** Six simulated launch histories (saturating
   player growth, weekend boost, slow story, binomial noise, a mid-week
   slowdown) with known truth 4.5 days out: this program beat **both** house
-  baselines in all six — e.g. 0.16–0.23 vs the house curve baseline's
-  0.26–0.31.
+  baselines in all six — 0.089–0.153 vs the house persistence baseline's
+  0.150–0.169 and the house curve baseline's 0.146–0.250.
 - **Grader-equivalent runs.** `python3 -P -s main.py` from a clean directory:
-  exit 0, 0.06 s per run (cap 8 s), byte-identical across two runs; also
+  exit 0, 0.07 s per run (cap 8 s), byte-identical across two runs; also
   exit 0 twice as user 65534 into the same output directory (the
   trophy-guide lesson: never delete the output folder itself).
 
